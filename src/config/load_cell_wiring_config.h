@@ -1,0 +1,6 @@
+#define LOAD_CELL_1_DOUT 2
+#define LOAD_CELL_1_SCK 3
+#define LOAD_CELL_2_DOUT 4
+#define LOAD_CELL_2_SCK 5
+#define LOAD_CELL_3_DOUT 6
+#define LOAD_CELL_3_SCK 7

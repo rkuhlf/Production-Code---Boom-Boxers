@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.jnlp": "html",
+        "*.rse": "xml",
+        "bitset": "cpp",
+        "deque": "cpp",
+        "sstream": "cpp",
+        "string": "cpp",
+        "valarray": "cpp",
+        "vector": "cpp"
+    }
+}
