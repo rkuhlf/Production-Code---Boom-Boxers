@@ -32,7 +32,6 @@
 // Assume that taring is unnecessary because we only care about the change in mass
 
 #include <Arduino.h>
-#include <iostream>
 
 #include <config/drain_hx711_config.h>
 #include <string>
@@ -48,7 +47,7 @@ const char* HEADER = "LC1,LC2,LC3,sum";
 const byte cal_precision = 3;
 
 unsigned long last_updated = 0;
-int time_increment = 500;
+int time_increment = 100;
 
 
 LoadCellHookup load_cell1(2, 3, LOAD_CELL_1_CAL);
@@ -95,7 +94,7 @@ bool debugln() {
 void setup() {
     Serial.begin(57600); delay(100);
 
-    Serial.print("Initializing SD:");
+    Serial.print("Init SD:");
     // Apparently some people have had to set the pin mode to high for it to work.
     // https://embedjournal.com/arduino-sd-card-initialization-failed/
     pinMode(10, OUTPUT);
@@ -113,7 +112,10 @@ void setup() {
     load_cell2.setup();
     load_cell3.setup();
 
-
+    debugln();
+    debugln();
+    debug("Cals:");
+    debugln();
     char str_cal[7];
     dtostrf(load_cell1.calibration_value, 0, cal_precision, str_cal);
     debug(str_cal);
@@ -133,7 +135,7 @@ void setup() {
 float new_mass = 0;
 byte incoming_byte = 0;
 bool printing_mass = true;
-char str_output[8];
+char str_output[16];
 
 void loop() {
     new_mass = load_cell1.get_mass() + load_cell2.get_mass() + load_cell3.get_mass();
@@ -142,6 +144,12 @@ void loop() {
         // check for new data and that it has been long enough
         if (millis() > last_updated + time_increment) {
             last_updated = millis();
+
+            // assign lval something then...
+            ltoa(last_updated, str_output, 10);
+            debug(str_output);
+            debug(",");
+
             dtostrf(load_cell1.get_voltage(), 0, 2, str_output);
             debug(str_output);
             debug(",");
@@ -161,7 +169,7 @@ void loop() {
     if (Serial.available()) {
         incoming_byte = Serial.parseInt();
 
-        Serial.print("Command:");
+        Serial.print("Input:");
         Serial.println(incoming_byte);
 
         if (incoming_byte == 1) {

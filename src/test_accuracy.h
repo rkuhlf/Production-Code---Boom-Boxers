@@ -47,7 +47,7 @@ float cal3 = 0.06976268166;
 void setup() {
     Serial.begin(57600);
     
-    delay(500);
+    delay(1000);
 
     Serial.println();
     Serial.println("Starting...");
@@ -87,7 +87,7 @@ void setup() {
 
 bool recording_value = false;
 bool printing_values = false;
-unsigned long print_interval = 0;
+unsigned long print_interval = 500;
 unsigned long last_printed = 0;
 
 float new_measurement1;
@@ -107,7 +107,7 @@ void handleNewData() {
         Serial.print(new_measurement1 / recordedCalibrationFactor1);
         Serial.print("; Load Cell 2: ");
         Serial.print(new_measurement2 / recordedCalibrationFactor2);
-         Serial.print("; Load Cell 3: ");
+        Serial.print("; Load Cell 3: ");
         Serial.println(new_measurement3 / recordedCalibrationFactor3);
 
         last_printed = millis();
