@@ -1,4 +1,5 @@
-import regex as re
+import io
+import pandas as pd
 
 
 DATA_PATH = "./post_processing/data/"
@@ -23,7 +24,9 @@ class LoadCellOutput:
         self.calibration3 = float(lines.pop(0))
 
         lines = pop_whitespace(lines)
-        
+
+        self.df = pd.read_csv(io.StringIO(lines.join("\n")))
+        print(self.df)
         
 
         
@@ -37,10 +40,15 @@ def split_file_by_runs(path: str):
         contents = contents.split("cals")
 
         for content in contents:
-            create_file_from_content("cals" + content)
+            LoadCellOutput("cals" + content)
 
 
 
+
+
+# Code to detect when a tank is loaded
+# Code to detect when a tank is being drained
+# Code to get total output over an interval
 
 if __name__ == "__main__":
     split_file_by_runs(DATA_PATH + "durability_test.txt")
