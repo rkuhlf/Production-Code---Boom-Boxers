@@ -1,5 +1,5 @@
-#include <EEPROM.h>
 #include <Arduino.h>
+#include <EEPROM.h>
 
 #include "config/eeprom_config.h"
 

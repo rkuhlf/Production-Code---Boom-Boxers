@@ -32,3 +32,21 @@ One of the load cells is working from within the HDX711 library.
 
 
 Well I finally fixed most of the memory issues because I need to free memory when I use pointers to strings. Two options are to try to get the file system working and to make folders for archived runs. Other option is to store everything in the same file and just make the end user sort through it. 
+
+
+// Time: 60206;     Load Cell output: 38649.79
+// Time: 60707;     Load Cell output: 38495.86
+// Time: 61209;     Load Cell output: 38354.64
+// Time: 61711;     Load Cell output: 38221.56
+// Time: 62213;     Load Cell output: 38100.67
+// Time: 62713;     Load Cell output: 37990.64
+
+// Time: 23078;     Load Cell output: 37420.28
+// Time: 23580;     Load Cell output: 37420.37
+// Time: 24082;     Load Cell output: 37420.58
+// Time: 24584;     Load Cell output: 37420.58
+// Time: 25085;     Load Cell output: 37420.80; Conclusion - baud has no effect. 
+
+Record drain is very near to the maximum capacity of RAM for the Arduino Uno.
+
+// DATA: https://docs.google.com/spreadsheets/d/1MPceNBFz5i5xC-sZ9yEknhpfw08qjMPKno4Q_jIPtjY/edit?usp=sharing

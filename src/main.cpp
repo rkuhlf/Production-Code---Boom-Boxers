@@ -14,14 +14,6 @@
 #include <write_eeprom.h>
 #endif
 
-#ifdef CONFIG_CALIBRATE
-#include <calibrate.h>
-#endif
-
 #ifdef CONFIG_TEST_ACCURACY
 #include <test_accuracy.h>
-#endif
-
-#ifdef CONFIG_CHECK_PREVIOUS
-#include <check_previous_run.h>
 #endif

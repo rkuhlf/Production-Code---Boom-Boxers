@@ -1,26 +1,4 @@
-// Check if serial monitor is working
-
-#include <Arduino.h>
-
 // File should be uploaded to an Arduino that already has a calibration value saved at the Eeprom address.
-
-// Time: 60206;     Load Cell output: 38649.79
-// Time: 60707;     Load Cell output: 38495.86
-// Time: 61209;     Load Cell output: 38354.64
-// Time: 61711;     Load Cell output: 38221.56
-// Time: 62213;     Load Cell output: 38100.67
-// Time: 62713;     Load Cell output: 37990.64
-
-// Time: 23078;     Load Cell output: 37420.28
-// Time: 23580;     Load Cell output: 37420.37
-// Time: 24082;     Load Cell output: 37420.58
-// Time: 24584;     Load Cell output: 37420.58
-// Time: 25085;     Load Cell output: 37420.80; Conclusion - baud has no effect
-
-
-// After ten seconds it randomly went up to 70000
-
-// Jiggling the wires I think makes it go down to 37000 again
 
 // Store the last five seconds of mass flow rates.
 // When the mass flow rate has been negative more than 90% of the time in the last five seconds, start recording.
@@ -31,18 +9,20 @@
 
 // Assume that taring is unnecessary because we only care about the change in mass
 
-#include <Arduino.h>
-
-#include <config/drain_hx711_config.h>
 #include <string>
 
-// #include "helpers/logger.h"
-#include "config/eeprom_config.h"
-#include "helpers/load_cell_hookup.hpp"
+// TODO: see if I can import EEPROM or if that requires too much memory.
+#include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
 
-const char* DEBUG_FILE = "data.txt"; // "debug.txt"
+#include "config/drain_hx711_config.h"
+#include "config/load_cell_wiring_config.h"
+#include "config/eeprom_config.h"
+#include "config/SPI_config.h"
+#include "load_cell_hookup.hpp"
+
+const char* DEBUG_FILE = "data.txt";
 const char* HEADER = "LC1,LC2,LC3,sum";
 const byte cal_precision = 3;
 
@@ -50,15 +30,9 @@ unsigned long last_updated = 0;
 int time_increment = 100;
 
 
-LoadCellHookup load_cell1(2, 3, LOAD_CELL_1_CAL);
-LoadCellHookup load_cell2(4, 5, LOAD_CELL_2_CAL);
-LoadCellHookup load_cell3(6, 7, LOAD_CELL_3_CAL);
-
-// RAM at 75% initially.
-// That extra 10% is all in the SD file.
-// Adding my write to file function makes it 85% and breaks everything.
-
-// Without the load cell class it goes to 50%
+LoadCellHookup load_cell1(LOAD_CELL_1_DOUT, LOAD_CELL_1_SCK, LOAD_CELL_1_CAL);
+LoadCellHookup load_cell2(LOAD_CELL_2_DOUT, LOAD_CELL_2_SCK, LOAD_CELL_2_CAL);
+LoadCellHookup load_cell3(LOAD_CELL_3_DOUT, LOAD_CELL_3_SCK, LOAD_CELL_3_CAL);
 
 File myFile;
 bool write_to_file(const char* to_write, const char* file_name) {
@@ -101,7 +75,7 @@ void setup() {
     digitalWrite(10, HIGH);
     delay(10);
     
-    if (!SD.begin(10)) {
+    if (!SD.begin(CS_PIN)) {
         Serial.println("fail");
 
         while (1);
@@ -112,8 +86,11 @@ void setup() {
     load_cell2.setup();
     load_cell3.setup();
 
+    // Newlines to separate from older runs.
     debugln();
     debugln();
+
+    // Write the calibrations that were used to the file.
     debug("Cals:");
     debugln();
     char str_cal[7];
@@ -132,55 +109,33 @@ void setup() {
     debugln();
 }
 
+// TODO: try adding prev_mass back in.
 float new_mass = 0;
-byte incoming_byte = 0;
-bool printing_mass = true;
 char str_output[16];
 
 void loop() {
     new_mass = load_cell1.get_mass() + load_cell2.get_mass() + load_cell3.get_mass();
 
-    if (printing_mass) {
-        // check for new data and that it has been long enough
-        if (millis() > last_updated + time_increment) {
-            last_updated = millis();
+    // Check for new data and that it has been long enough.
+    if (millis() > last_updated + time_increment) {
+        last_updated = millis();
 
-            // assign lval something then...
-            ltoa(last_updated, str_output, 10);
-            debug(str_output);
-            debug(",");
+        // Convert the time into a string for output.
+        ltoa(last_updated, str_output, 10);
+        debug(str_output);
+        debug(",");
 
-            dtostrf(load_cell1.get_voltage(), 0, 2, str_output);
-            debug(str_output);
-            debug(",");
-            dtostrf(load_cell2.get_voltage(), 0, 2, str_output);
-            debug(str_output);
-            debug(",");
-            dtostrf(load_cell3.get_voltage(), 0, 2, str_output);
-            debug(str_output);
-            debug(",");
-            dtostrf(new_mass, 0, 2, str_output);
-            debug(str_output);
-            debugln();
-        }
-    }
-    
-
-    if (Serial.available()) {
-        incoming_byte = Serial.parseInt();
-
-        Serial.print("Input:");
-        Serial.println(incoming_byte);
-
-        if (incoming_byte == 1) {
-            printing_mass = false;
-        }
-
-        if (incoming_byte == 2) {
-            printing_mass = true;
-            debugln();
-            debug(HEADER);
-            debugln();
-        }
+        dtostrf(load_cell1.get_voltage(), 0, 2, str_output);
+        debug(str_output);
+        debug(",");
+        dtostrf(load_cell2.get_voltage(), 0, 2, str_output);
+        debug(str_output);
+        debug(",");
+        dtostrf(load_cell3.get_voltage(), 0, 2, str_output);
+        debug(str_output);
+        debug(",");
+        dtostrf(new_mass, 0, 2, str_output);
+        debug(str_output);
+        debugln();
     }
 }

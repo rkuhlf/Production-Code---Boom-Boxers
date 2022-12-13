@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 // File should be uploaded to an Arduino that already has a calibration value saved at the Eeprom address.
 // Baud has no effect; neither do random delays in the looping.
 
@@ -10,19 +8,18 @@
 // With the theory that it will be decreasing half the time when there is no flow and 100% of the time when it is flowing.
 
 
-// DATA: https://docs.google.com/spreadsheets/d/1MPceNBFz5i5xC-sZ9yEknhpfw08qjMPKno4Q_jIPtjY/edit?usp=sharing
-
 #include <Arduino.h>
-#include <iostream>
+
+#include <HX711_ADC.h>
+#include <EEPROM.h>
 
 #include "config/drain_hx711_config.h"
-#include <HX711_ADC.h>
-
-#include <EEPROM.h>
 #include "config/eeprom_config.h"
 #include "config/load_cell_wiring_config.h"
 
-
+// Does not use the wrapper because it needs to store data differently.
+// TODO: encapsulate this somehow so I do not have so much repetition.
+// Go back to using EEPROM.
 HX711_ADC LoadCell1(LOAD_CELL_1_DOUT, LOAD_CELL_1_SCK);
 HX711_ADC LoadCell2(LOAD_CELL_2_DOUT, LOAD_CELL_2_SCK);
 HX711_ADC LoadCell3(LOAD_CELL_3_DOUT, LOAD_CELL_3_SCK);
@@ -38,8 +35,6 @@ float recordedCalibrationFactor1;
 float recordedCalibrationFactor2;
 float recordedCalibrationFactor3;
 
-// 103 kg
-// 		
 float cal1 = 0.06654563711;
 float cal2 = 0.07054315246;
 float cal3 = 0.06976268166;
