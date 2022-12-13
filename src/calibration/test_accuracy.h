@@ -128,7 +128,7 @@ float get_mean(float* arr) {
 void loop() {
     time = millis();
 
-    // check for new data/start next conversion:
+    // Check for new data/start next conversion:
     if (LoadCell1.update()) {
         // For some reason getData outputs an int. Bruh.
         new_measurement1 = LoadCell1.getData();
